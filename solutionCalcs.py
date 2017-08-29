@@ -138,87 +138,88 @@ into which the salts are mixed. This should be adjusted when I come up with a go
     return (melt_cap)
     
     
-def find_solubility(composition,temp):
-    ''' Composition is a 4x1 vector giving the molar concentration of
+def find_solubility(n_nacl, n_mgcl, n_cacl, n_kcl,temp):
+    ''' Composition is 4x1 vectors giving the molar concentration of
 NaCl, MgCl, CaCl, KCl in the given order. Temp is simply the temperature. The script begins with the given composition dissolved in a 1000 gram of water. 
 If the given composition does not fully dissolve in 1000g of water, the function returns nan. This should be adjusted when I come up with a good idea of what is most relevant '''
     
-
+    composition = [n_nacl, n_mgcl, n_cacl, n_kcl]
     m_evap = 0
-    eqgram, fgram, SI, ENTL, ENTS, CPL, PBUB, pH, pHC, IStr, AW, ie =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],1000,temp)
-    if ie == 0:    
-        fgram[-4]=0
-        tot_solid=np.sum(fgram)
+    prod =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],1000,temp)
+    print(prod['Error message'])
+    if prod['Error message'] == 0:    
+        prod['Solid phases']['Ice']=0
+        tot_solid=sum(prod['Solid phases'].values())
     else:
         tot_solid =10
-
+    #print(tot_solid)
     if np.abs(tot_solid) < 0.001:       
             while np.abs(tot_solid) < 0.001:
                 m_evap=m_evap+100
-                eqgram, fgram, SI, ENTL, ENTS, CPL, PBUB, pH, pHC, IStr, AW, ie =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],1000-m_evap,temp)
-                if ie == 0:    
-                    fgram[-4]=0
-                    tot_solid=np.sum(fgram)
+                prod =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],1000-m_evap,temp)
+                if prod['Error message'] == 0:    
+                    prod['Solid phases']['Ice']=0
+                    tot_solid=sum(prod['Solid phases'].values())
                 else:
                     tot_solid =10
             m_evap = m_evap -100   
-            eqgram, fgram, SI, ENTL, ENTS, CPL, PBUB, pH, pHC, IStr, AW, ie =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],1000-m_evap,temp)
-            fgram[-4]=0
-            tot_solid=np.sum(fgram)
+            prod =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],1000-m_evap,temp)
+            prod['Solid phases']['Ice']=0
+            tot_solid=sum(prod['Solid phases'].values())
             
             while np.abs(tot_solid) < 0.001:
                 m_evap=m_evap+10
-                eqgram, fgram, SI, ENTL, ENTS, CPL, PBUB, pH, pHC, IStr, AW, ie =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],1000-m_evap,temp)
-                if ie == 0:    
-                    fgram[-4]=0
-                    tot_solid=np.sum(fgram)
+                prod =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],1000-m_evap,temp)
+                if prod['Error message'] == 0:    
+                    prod['Solid phases']['Ice']=0
+                    tot_solid=sum(prod['Solid phases'].values())
                 else:
                     tot_solid =10
             m_evap = m_evap -10   
-            eqgram, fgram, SI, ENTL, ENTS, CPL, PBUB, pH, pHC, IStr, AW, ie =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],1000-m_evap,temp)
-            fgram[-4]=0
-            tot_solid=np.sum(fgram)
+            prod =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],1000-m_evap,temp)
+            prod['Solid phases']['Ice']=0
+            tot_solid=sum(prod['Solid phases'].values())
             
             
             while np.abs(tot_solid) < 0.001:
                 m_evap=m_evap+1
-                eqgram, fgram, SI, ENTL, ENTS, CPL, PBUB, pH, pHC, IStr, AW, ie =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],1000-m_evap,temp)
-                if ie == 0:    
-                    fgram[-4]=0
-                    tot_solid=np.sum(fgram)
+                prod =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],1000-m_evap,temp)
+                if prod['Error message'] == 0:    
+                    prod['Solid phases']['Ice']=0
+                    tot_solid=sum(prod['Solid phases'].values())
                 else:
                     tot_solid =10
             m_evap = m_evap -1   
-            eqgram, fgram, SI, ENTL, ENTS, CPL, PBUB, pH, pHC, IStr, AW, ie =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],1000-m_evap,temp)
-            fgram[-4]=0
-            tot_solid=np.sum(fgram)
+            prod =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],1000-m_evap,temp)
+            prod['Solid phases']['Ice']=0
+            tot_solid=sum(prod['Solid phases'].values())
             
             
             while np.abs(tot_solid) < 0.001:
                 m_evap=m_evap+0.1
-                eqgram, fgram, SI, ENTL, ENTS, CPL, PBUB, pH, pHC, IStr, AW, ie =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],1000-m_evap,temp)
-                if ie == 0:    
-                    fgram[-4]=0
-                    tot_solid=np.sum(fgram)
+                prod =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],1000-m_evap,temp)
+                if prod['Error message'] == 0:    
+                    prod['Solid phases']['Ice']=0
+                    tot_solid=sum(prod['Solid phases'].values())
                 else:
                     tot_solid =10
             m_evap = m_evap -0.1   
-            eqgram, fgram, SI, ENTL, ENTS, CPL, PBUB, pH, pHC, IStr, AW, ie =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],1000-m_evap,temp)
-            fgram[-4]=0
-            tot_solid=np.sum(fgram)
+            prod =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],1000-m_evap,temp)
+            prod['Solid phases']['Ice']=0
+            tot_solid=sum(prod['Solid phases'].values())
             
             while np.abs(tot_solid) < 0.001:
                 m_evap=m_evap+0.01
-                eqgram, fgram, SI, ENTL, ENTS, CPL, PBUB, pH, pHC, IStr, AW, ie =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],1000-m_evap,temp)
-                if ie == 0:    
-                    fgram[-4]=0
-                    tot_solid=np.sum(fgram)
+                prod =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],1000-m_evap,temp)
+                if prod['Error message'] == 0:    
+                    prod['Solid phases']['Ice']=0
+                    tot_solid=sum(prod['Solid phases'].values())
                 else:
                     tot_solid =10
             m_evap = m_evap -0.01   
-            eqgram, fgram, SI, ENTL, ENTS, CPL, PBUB, pH, pHC, IStr, AW, ie =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],1000-m_evap,temp)
-            fgram[-4]=0
-            tot_solid=np.sum(fgram)
+            prod =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],1000-m_evap,temp)
+            prod['Solid phases']['Ice']=0
+            tot_solid=sum(prod['Solid phases'].values())
             
             
             water_remaining = 1000- m_evap
@@ -706,7 +707,9 @@ def check_possible_solids(n_nacl, n_mgcl, n_cacl, n_kcl, temp):
     print(inx)    
     
     return(inx)
- 
+
+
+
 def aq_specID_to_dissolved_species(argument):
         switcher = {
             0: "Water",
@@ -715,10 +718,12 @@ def aq_specID_to_dissolved_species(argument):
             3: "Mg++",
             4: "Ca++",
             5: "H+",
+            6: "None1",
             7: "Cl-",
-            6: "SO4--",
-            8: "HSO4-",
-            9: "OH-",
+            8: "SO4--",
+            9: "HSO4-",
+            10: "OH-",
+            11: "None2",
         }
         return switcher.get(argument, "nothing")       
             
@@ -852,3 +857,70 @@ def calc_MC_from_phase(self, temp, conc, msol, solute):
      cf= calc_real_liqConc(solute,temp)
      MC = (conc*msol)/cf - msol
      return(MC)
+
+
+
+
+def find_precip_temp(n_nacl, n_mgcl, n_cacl, n_kcl,m_water):
+    ''' Composition is 4x1 vectors giving the molar concentration of
+NaCl, MgCl, CaCl, KCl in the given order. Temp begins at 200 degC. The script begins with the given composition dissolved in a 1000 gram of water. 
+If the given composition does not fully dissolve in 1000g of water, the function returns nan. This should be adjusted when I come up with a good idea of what is most relevant '''
+    
+#    n_nacl=5
+#    n_mgcl=3
+#    n_cacl=4
+#    n_kcl=0
+#    m_water=2000
+    def increment_property(temp_initial,increment, prev_dict):
+        prod =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],m_water,temp_initial)
+        d=dict((k,temp_initial) for k, v in prod['Solid phases'].items() if v > 0)
+        #print('The initial temperature for the loop in %.2f' %temp_initial)
+        #print('And the increment is %.2f' %increment)
+        #print('The sum of the two are %.2f' %(temp_initial+increment))
+        #print('The initial dict keys for the loop are')
+        print(d.keys())
+        while (d.keys() == prev_dict.keys() and prod['Error message'] == 0):
+            #print('The step temp should be %.2f'% (temp_initial+increment))
+            temp_initial=(temp_initial+increment)
+            #print('but step temp is %.2f'% temp_initial)
+            prod =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],m_water,temp_initial)
+            d=dict((k,temp_initial) for k, v in prod['Solid phases'].items() if v > 0)
+            #print('The new d:')
+            #print(d.keys())
+            #print('At temperarure %.2f' %temp_initial)
+            #print('Which is compared with:')
+            #print(prev_dict.keys())
+            #print('-----------------')
+        return(temp_initial-increment,d, prod['Error message'])
+        
+    composition = [n_nacl, n_mgcl, n_cacl, n_kcl]
+    T_init=50.05
+    data_dict={}
+    prod =aq12.get_alldata(composition[0],composition[1],composition[2],composition[3],m_water,T_init)
+    if prod['Error message'] == 0:
+        d=dict((k,T_init) for k, v in prod['Solid phases'].items() if v > 0)
+        for k,v in d.items():
+            if k not in data_dict: 
+                data_dict[k]=v
+
+        prev_dict = data_dict
+        prd_error=0
+
+        while prd_error == 0:
+            print('.....................................................')
+            print('Start loop from temperature %.2f and error is %f' %(T_init-0.05, prd_error))
+            print('With new reference dict being:')
+            print(prev_dict.keys())
+            T_init,di,prd_error=increment_property(T_init-0.05,-10,prev_dict)
+            #print(ara)
+            T_init,di,prd_error=increment_property(T_init,-5,prev_dict)
+            #print(ara)
+            T_init,di,prd_error=increment_property(T_init,-1,prev_dict)
+            #print(ara)
+            T_init,di,prd_error=increment_property(T_init,-0.05,prev_dict)
+            for k,v in di.items():
+                if k not in data_dict: 
+                    data_dict[k]=v
+            prev_dict = data_dict
+         
+    return (data_dict)
