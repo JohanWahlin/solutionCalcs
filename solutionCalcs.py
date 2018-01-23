@@ -12,7 +12,7 @@ import scipy.constants
 import numpy as np
 from iapws import IAPWS95
 from iapws import _Ice
-import access_aqsol012 as aq12
+from solutionCalcs import access_aqsol012 as aq12
 from imp import reload
 #import matplotlib.pyplot as plt
 
@@ -924,3 +924,81 @@ If the given composition does not fully dissolve in 1000g of water, the function
             prev_dict = data_dict
          
     return (data_dict)
+    
+def find_solvable_amount(species, solution,temp):
+    '''find solubility of substance species in solution [n_nacl, n_mgcl, n_cacl, n_kcl, mwater] at temperature temp'''
+    
+    def species_to_index(species):
+        switch={'nacl':0,
+                'mgcl':1,
+                'cacl':2,
+                'kcl':3}
+        return(switch[species])
+    original_species=solution[species_to_index(species)]
+    #print(original_species)
+    #solution = [0, 0, sc.wt2mol(0.2,'cacl'), 0,1000]
+    #temp=-15
+    #species='nacl'
+    #m_spec=0
+    prod =aq12.get_alldata(solution[0],solution[1],solution[2],solution[3],solution[4],temp)
+    if prod['Error message'] == 0:    
+        prod['Solid phases']['Ice']=0
+        tot_solid=sum(prod['Solid phases'].values())
+    else:
+        tot_solid =10
+        
+    if np.abs(tot_solid) < 0.001:           
+        while np.abs(tot_solid) < 0.001:
+            solution[species_to_index(species)]+=1 #adds one mole of species to solution
+            prod =aq12.get_alldata(solution[0],solution[1],solution[2],solution[3],solution[4],temp)
+            if prod['Error message'] == 0:    
+                prod['Solid phases']['Ice']=0
+                tot_solid=sum(prod['Solid phases'].values())
+            else:
+                tot_solid =10
+        solution[species_to_index(species)]-=1 #removes the last one mole of species to solution  , for next loop
+        prod =aq12.get_alldata(solution[0],solution[1],solution[2],solution[3],solution[4],temp)
+        prod['Solid phases']['Ice']=0
+        tot_solid=sum(prod['Solid phases'].values())
+        
+        while np.abs(tot_solid) < 0.001:
+            solution[species_to_index(species)]+=0.1 #adds 0.one mole of species to solution
+            prod =aq12.get_alldata(solution[0],solution[1],solution[2],solution[3],solution[4],temp)
+            if prod['Error message'] == 0:    
+                prod['Solid phases']['Ice']=0
+                tot_solid=sum(prod['Solid phases'].values())
+            else:
+                tot_solid =10
+           
+        solution[species_to_index(species)]-=0.1 #removes the last 0.one mole of species to solution  , for next loop
+        prod =aq12.get_alldata(solution[0],solution[1],solution[2],solution[3],solution[4],temp)
+        prod['Solid phases']['Ice']=0
+        tot_solid=sum(prod['Solid phases'].values())
+                      
+        while np.abs(tot_solid) < 0.001:
+            solution[species_to_index(species)]+=0.01 #adds 0.zeroone mole of species to solution
+            prod =aq12.get_alldata(solution[0],solution[1],solution[2],solution[3],solution[4],temp)
+            if prod['Error message'] == 0:    
+                prod['Solid phases']['Ice']=0
+                tot_solid=sum(prod['Solid phases'].values())
+            else:
+                tot_solid =10
+        prod =aq12.get_alldata(solution[0],solution[1],solution[2],solution[3],solution[4],temp)
+        solution[species_to_index(species)]+=0.01 #removes last 0.zeroone mole of species from solutionfor final answer
+    
+    else:
+        dissolved_amount = np.nan
+        phases={}
+        for key, value in prod['Solid phases'].items():
+            if value>0.01:
+                phases[key]= value
+        return(dissolved_amount, phases)
+    #print(original_species)    
+    dissolved_amount=solution[species_to_index(species)]-original_species
+    print(dissolved_amount)
+    phases={}
+    for key, value in prod['Solid phases'].items():
+        if value>0.01:
+            phases[key]= value
+            
+    return(dissolved_amount, phases)
